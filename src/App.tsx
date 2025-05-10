@@ -1,11 +1,12 @@
 import Konva from 'konva';
 import { useRef, useState } from 'react';
-import { Group, Layer, Rect, Stage, Text } from 'react-konva';
+import { Group, Image, Layer, Rect, Stage, Text } from 'react-konva';
+import useImage from 'use-image';
 
-const CELL_WIDTH = 200;
+const CELL_WIDTH = 350;
 const CELL_HEIGHT = 150;
 const GRID_ROWS = 4;
-const GRID_COLS = 4;
+const GRID_COLS = 2;
 const GRID_GAP = 10;
 const GRID_PADDING_HORIZONTAL = 40;
 const GRID_PADDING_VERTICAL = 80;
@@ -56,6 +57,9 @@ export default function App() {
   const [menuItems, setMenuItems] = useState<Product[]>(productList);
   const [konvaItems, setKonvaItems] = useState<KonvaItem[]>([]);
   const snapCoords = useRef<Coord>({ x: 0, y: 0 });
+
+  // Inside your component
+  const [beerImage] = useImage('/images/bottle.svg'); // Adjust image path accordingly
 
   const coords: Coord[] = Array.from(
     { length: GRID_ROWS * GRID_COLS },
@@ -214,6 +218,7 @@ export default function App() {
                 draggable
                 onDragEnd={(e) => handleDragEnd(e, idx)}
                 onDragMove={(e) => {
+                  e.target.moveToTop();
                   const { x, y } = e.target.position();
                   const maxCoord = getPerfectDropCoords(x, y);
                   snapCoords.current = maxCoord || { x: 0, y: 0 };
@@ -222,17 +227,46 @@ export default function App() {
                 <Rect
                   width={CELL_WIDTH}
                   height={CELL_HEIGHT}
-                  fill="#fff"
-                  stroke="#333"
-                  shadowBlur={5}
-                  cornerRadius={8}
+                  fill="#eee"
+                  stroke="#aaa"
+                  shadowBlur={4}
+                  cornerRadius={10}
                 />
+
                 <Text
-                  text={`${item.name}\n${item.price}`}
+                  text={`${item.name} | ${'330ml'}`}
+                  fontSize={14}
+                  fontStyle="bold"
+                  fill="#111"
+                  x={10}
+                  y={10}
+                />
+
+                <Text
+                  text="Non-alcoholic beer"
+                  fontSize={12}
+                  fill="#555"
+                  x={10}
+                  y={30}
+                />
+
+                {beerImage && (
+                  <Image
+                    image={beerImage}
+                    x={CELL_WIDTH - 75}
+                    y={10}
+                    width={50}
+                    height={50}
+                  />
+                )}
+
+                <Text
+                  text={`${item.price} £`}
                   fontSize={16}
-                  fill="#222"
-                  padding={10}
-                  width={CELL_WIDTH}
+                  fontStyle="bold"
+                  fill="#000"
+                  x={10}
+                  y={CELL_HEIGHT - 30}
                 />
               </Group>
             ))}
